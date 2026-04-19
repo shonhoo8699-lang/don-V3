@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дон — Яриаг текст болгох</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-50: #EBF4FF;
+    --blue-100: #C3DCFD;
+    --blue-300: #5BA3F5;
+    --blue-500: #2176FF;
+    --blue-700: #1050CC;
+    --blue-900: #0A2A6B;
+    --bg: #F4F7FF;
+    --surface: #FFFFFF;
+    --surface2: #F0F4FF;
+    --text-primary: #0D1B3E;
+    --text-secondary: #4A5578;
+    --text-muted: #8A95B0;
+    --border: rgba(33, 118, 255, 0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 80% -100px, rgba(33,118,255,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 300px at -10% 80%, rgba(91,163,245,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  header {
+    padding: 32px 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--blue-500);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+  }
+
+  .logo-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue-700);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-tag {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
+  .lang-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 14px 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+
+  .lang-pill:hover { border-color: var(--blue-300); color: var(--blue-500); }
+
+  .lang-pill select {
+    border: none; background: transparent; font-size: 13px;
+    color: var(--text-secondary); cursor: pointer; outline: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 16px 0 36px;
+  }
+
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  .hero h1 span {
+    color: var(--blue-500);
+  }
+
+  .hero p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Main card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 40px rgba(33, 118, 255, 0.06);
+  }
+
+  /* Mic section */
+  .mic-section {
+    padding: 40px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(180deg, var(--blue-50) 0%, white 100%);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .wave-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 48px;
+    margin-bottom: 24px;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .wave-container.visible { opacity: 1; }
+
+  .wave-bar {
+    width: 5px;
+    border-radius: 10px;
+    background: var(--blue-300);
+    animation: waveAnim 0.9s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { height: 12px; animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 28px; animation-delay: 0.12s; background: var(--blue-500); }
+  .wave-bar:nth-child(3) { height: 20px; animation-delay: 0.24s; }
+  .wave-bar:nth-child(4) { height: 36px; animation-delay: 0.08s; background: var(--blue-500); }
+  .wave-bar:nth-child(5) { height: 16px; animation-delay: 0.3s; }
+  .wave-bar:nth-child(6) { height: 32px; animation-delay: 0.16s; background: var(--blue-300); }
+  .wave-bar:nth-child(7) { height: 22px; animation-delay: 0.05s; }
+  .wave-bar:nth-child(8) { height: 14px; animation-delay: 0.2s; }
+  .wave-bar:nth-child(9) { height: 30px; animation-delay: 0.35s; background: var(--blue-500); }
+
+  @keyframes waveAnim {
+    0%, 100% { transform: scaleY(0.35); opacity: 0.6; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  .mic-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .mic-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 2px solid var(--blue-300);
+    opacity: 0;
+    animation: none;
+  }
+
+  .mic-ring.pulse {
+    animation: ringPulse 1.6s ease-out infinite;
+  }
+
+  .mic-ring:nth-child(2) { animation-delay: 0.5s; }
+
+  @keyframes ringPulse {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+
+  .mic-btn {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: var(--blue-500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 8px 24px rgba(33, 118, 255, 0.35);
+  }
+
+  .mic-btn:hover {
+    transform: scale(1.07);
+    box-shadow: 0 12px 32px rgba(33, 118, 255, 0.45);
+  }
+
+  .mic-btn:active { transform: scale(0.95); }
+
+  .mic-btn.recording {
+    background: #E24B4A;
+    box-shadow: 0 8px 24px rgba(226, 75, 74, 0.4);
+  }
+
+  .mic-btn.recording:hover {
+    box-shadow: 0 12px 32px rgba(226, 75, 74, 0.5);
+  }
+
+  .mic-btn svg { width: 32px; height: 32px; fill: white; }
+
+  /* Stop icon */
+  .stop-icon {
+    width: 24px; height: 24px;
+    background: white;
+    border-radius: 5px;
+    display: none;
+  }
+
+  .mic-btn.recording .mic-icon { display: none; }
+  .mic-btn.recording .stop-icon { display: block; }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: all 0.3s;
+  }
+
+  .status-dot.active {
+    background: #E24B4A;
+    animation: dotBlink 1.2s infinite;
+  }
+
+  @keyframes dotBlink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Text section */
+  .text-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 28px 20px;
+  }
+
+  .text-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .text-output {
+    flex: 1;
+    min-height: 180px;
+    width: 100%;
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--surface2);
+    padding: 16px;
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .text-output:focus {
+    border-color: var(--blue-300);
+    background: white;
+  }
+
+  .text-output::placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .text-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .char-count {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 8px;
+    padding: 16px 28px 24px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 18px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-weight: 500;
+  }
+
+  .btn:hover {
+    border-color: var(--blue-300);
+    color: var(--blue-500);
+    background: var(--blue-50);
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--blue-500);
+    border-color: var(--blue-500);
+    color: white;
+    box-shadow: 0 4px 14px rgba(33,118,255,0.25);
+  }
+
+  .btn-primary:hover {
+    background: var(--blue-700);
+    border-color: var(--blue-700);
+    color: white;
+    box-shadow: 0 6px 20px rgba(33,118,255,0.35);
+  }
+
+  .btn-danger { color: #E24B4A; }
+  .btn-danger:hover { border-color: #E24B4A; color: #E24B4A; background: #FEF0F0; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue-500);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--blue-900);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 100px;
+    font-size: 14px;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Notice */
+  .notice {
+    background: #FFF8EC;
+    border: 1px solid #FAC775;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #633806;
+    margin-bottom: 16px;
+    display: none;
+    line-height: 1.6;
+  }
+
+  .notice.show { display: block; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 16px 0 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    position: relative; z-index: 1;
+  }
+
+  footer span { color: var(--blue-300); }
+
+  @media (max-width: 500px) {
+    .mic-section { padding: 32px 20px 24px; }
+    .text-section { padding: 20px 20px 16px; }
+    .actions { padding: 14px 20px 20px; }
+    .hero h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">Дон</div>
+        <div class="logo-tag">Яриаг текст болгох</div>
+      </div>
+    </div>
+    <div class="lang-pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:#5BA3F5">
+        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/>
+      </svg>
+      <select id="langSelect">
+        <option value="mn-MN">Монгол</option>
+        <option value="en-US">English</option>
+        <option value="zh-CN">中文</option>
+        <option value="ja-JP">日本語</option>
+        <option value="ko-KR">한국어</option>
+        <option value="ru-RU">Русский</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1>Ярьж <span>бичнэ үү</span></h1>
+    <p>Микрофон товч дарж ярьж эхлэнэ үү — таны дуу шууд текст болно.</p>
+  </div>
+
+  <div class="notice" id="notice">
+    ⚠️ Таны браузер яриа таних функцийг дэмжихгүй байна. Chrome эсвэл Edge браузер ашиглана уу.
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-val" id="wordCount">0</div>
+      <div class="stat-label">Үг</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="charCountStat">0</div>
+      <div class="stat-label">Тэмдэгт</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="sessionTime">0:00</div>
+      <div class="stat-label">Хугацаа</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="mic-section">
+      <div class="wave-container" id="waveAnim">
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <div class="mic-wrap">
+        <div class="mic-ring" id="ring1"></div>
+        <div class="mic-ring" id="ring2"></div>
+        <button class="mic-btn" id="micBtn">
+          <svg class="mic-icon" viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
+          </svg>
+          <div class="stop-icon"></div>
+        </button>
+      </div>
+
+      <div class="status-row">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Товч дарж ярьж эхлэнэ үү</span>
+      </div>
+    </div>
+
+    <div class="text-section">
+      <div class="text-label">Таны текст</div>
+      <textarea class="text-output" id="textOutput" placeholder="Микрофон товч дарж ярихад таны үг энд гарч ирнэ..."></textarea>
+      <div class="text-footer">
+        <span class="char-count" id="charCountBottom">0 тэмдэгт</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="copyBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+        Хуулах
+      </button>
+      <button class="btn" id="downloadBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/>
+        </svg>
+        Татаж авах
+      </button>
+      <button class="btn btn-danger" id="clearBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+        </svg>
+        Цэвэрлэх
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <span>Дон</span> — Дуу хоолойгоороо бичих хамгийн хялбар арга
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const micBtn = document.getElementById('micBtn');
+  const statusText = document.getElementById('statusText');
+  const statusDot = document.getElementById('statusDot');
+  const textOutput = document.getElementById('textOutput');
+  const waveAnim = document.getElementById('waveAnim');
+  const notice = document.getElementById('notice');
+  const toast = document.getElementById('toast');
+  const langSelect = document.getElementById('langSelect');
+  const ring1 = document.getElementById('ring1');
+  const ring2 = document.getElementById('ring2');
+  const charCountBottom = document.getElementById('charCountBottom');
+  const charCountStat = document.getElementById('charCountStat');
+  const wordCount = document.getElementById('wordCount');
+  const sessionTime = document.getElementById('sessionTime');
+
+  let recognition = null;
+  let isRecording = false;
+  let fullTranscript = '';
+  let startTime = null;
+  let timerInterval = null;
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const useIOSMode = isIOS;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    notice.classList.add('show');
+    micBtn.disabled = true;
+    micBtn.style.opacity = '0.4';
+    micBtn.style.cursor = 'not-allowed';
+  }
+
+  function updateStats(text) {
+    const chars = text.length;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    charCountBottom.textContent = chars + ' тэмдэгт';
+    charCountStat.textContent = chars;
+    wordCount.textContent = words;
+  }
+
+  function updateTimer() {
+    if (!startTime) return;
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    sessionTime.textContent = m + ':' + String(s).padStart(2, '0');
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function setupRecognition() {
+    recognition = new SpeechRecognition();
+    recognition.continuous = useIOSMode ? false : true;
+    recognition.interimResults = useIOSMode ? false : true;
+    recognition.lang = langSelect.value;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      micBtn.classList.add('recording');
+      statusText.textContent = useIOSMode ? 'Ярьж дуусаад зогсоно уу...' : 'Сонсож байна...';
+      statusDot.classList.add('active');
+      waveAnim.classList.add('visible');
+      ring1.classList.add('pulse');
+      ring2.classList.add('pulse');
+      if (!startTime) startTime = Date.now();
+      if (!timerInterval) timerInterval = setInterval(updateTimer, 1000);
+    };
+
+    recognition.onresult = (e) => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += t + ' ';
+        else interim += t;
+      }
+      if (final) fullTranscript += final;
+      textOutput.value = fullTranscript + interim;
+      updateStats(textOutput.value);
+    };
+
+    recognition.onerror = (e) => {
+      if (e.error === 'not-allowed') {
+        showToast('Микрофоны зөвшөөрөл олгоно уу');
+        stopRecording();
+      } else if (e.error === 'no-speech') {
+        if (!useIOSMode && isRecording) recognition.start();
+      } else {
+        showToast('Алдаа: ' + e.error);
+        stopRecording();
+      }
+    };
+
+    recognition.onend = () => {
+      if (useIOSMode) {
+        micBtn.classList.remove('recording');
+        statusDot.classList.remove('active');
+        waveAnim.classList.remove('visible');
+        ring1.classList.remove('pulse');
+        ring2.classList.remove('pulse');
+        isRecording = false;
+        statusText.textContent = 'Дахин дарж үргэлжлүүлнэ үү';
+      } else {
+        if (isRecording) recognition.start();
+      }
+    };
+  }
+
+  function stopRecording() {
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    statusText.textContent = 'Товч дарж ярьж эхлэнэ үү';
+    statusDot.classList.remove('active');
+    waveAnim.classList.remove('visible');
+    ring1.classList.remove('pulse');
+    ring2.classList.remove('pulse');
+    clearInterval(timerInterval);
+    if (recognition) recognition.stop();
+  }
+
+  if (SpeechRecognition) {
+    micBtn.addEventListener('click', () => {
+      if (!isRecording) {
+        fullTranscript = textOutput.value ? textOutput.value.trimEnd() + ' ' : '';
+        if (isIOS) {
+          navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(() => { setupRecognition(); recognition.start(); })
+            .catch(() => showToast('Микрофоны зөвшөөрөл олгоно уу: Settings → Safari → Microphone'));
+        } else {
+          setupRecognition();
+          recognition.start();
+        }
+      } else {
+        if (useIOSMode) {
+          recognition.stop();
+        } else {
+          stopRecording();
+        }
+      }
+    });
+
+    langSelect.addEventListener('change', () => {
+      if (isRecording) {
+        stopRecording();
+        setTimeout(() => { setupRecognition(); recognition.start(); }, 300);
+      }
+    });
+  }
+
+  textOutput.addEventListener('input', () => updateStats(textOutput.value));
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const text = textOutput.value.trim();
+    if (!text) { showToast('Хуулах текст алга'); return; }
+    navigator.clipboard.writeText(text).then(() => showToast('Хуулагдлаа ✓'));
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const text = textOutput.value.trim();
+    if (!text) { showToast('Татаж авах текст алга'); return; }
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'don-' + new Date().toISOString().slice(0,10) + '.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Татаж авлаа ✓');
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    textOutput.value = '';
+    fullTranscript = '';
+    startTime = null;
+    clearInterval(timerInterval);
+    sessionTime.textContent = '0:00';
+    updateStats('');
+    showToast('Цэвэрлэгдлээ');
+  });
+</script>
+</body>
+</html>
